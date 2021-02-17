@@ -1,3 +1,3 @@
 #!/bin/bash
 python3 init.py
-pause
+sqlite3 movies_rating.db < db_init.sql
