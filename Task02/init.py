@@ -20,10 +20,10 @@ purge_tables_queries = {
 }
 
 fill_database_core_queries = {
-    "movies": 'INSERT INTO movies (id, title, year, genres) VALUES ',
-    "ratings": 'INSERT INTO ratings (user_id, movie_id, rating, timestamp) VALUES ',
-    "tags": 'INSERT INTO tags (user_id, movie_id, tag, timestamp) VALUES ',
-    "users": 'INSERT INTO users (id, name, email, gender, register_date, occupation) VALUES '
+    "movies": 'INSERT INTO movies (id, title, year, genres) VALUES ' + EOL,
+    "ratings": 'INSERT INTO ratings (user_id, movie_id, rating, timestamp) VALUES ' + EOL,
+    "tags": 'INSERT INTO tags (user_id, movie_id, tag, timestamp) VALUES ' + EOL,
+    "users": 'INSERT INTO users (id, name, email, gender, register_date, occupation) VALUES ' + EOL
 }
 
 
@@ -72,13 +72,13 @@ def compose_insert_query_from_file(file_name):
     for raw_line in lines:
         fields = raw_line.split(splitter)
 
-        fields[:] = ['"' + x.replace('"', '""').replace('\'', '\'\'') + '"' for x in fields]
+        fields[:] = ['"' + x.replace('"', '""').replace('\'', '\'\'').replace('\n', '') + '"' for x in fields]
 
         comma_separated_fields = comma.join(fields)
-        values_to_insert_query_part = '(' + comma_separated_fields + ')'
+        values_to_insert_query_part = '(' + comma_separated_fields + ')' + EOL
         full_query += values_to_insert_query_part + ','
 
-    return full_query[:-1] + ';'
+    return full_query[:-1] + ';' + EOL
 
 def compose_insert_query_movies_table_from_file(file_name):
     movies_file_csv =  open(file_name, 'r')
