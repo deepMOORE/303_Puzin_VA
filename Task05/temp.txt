@@ -1,0 +1,158 @@
+PRAGMA foreign_keys = OFF;
+-- new tables
+CREATE TABLE IF NOT EXISTS genres
+(
+    id    INTEGER PRIMARY KEY,
+    title TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS movies_genres
+(
+    id       INTEGER PRIMARY KEY,
+    movie_id INTEGER NOT NULL,
+    genre_id INTEGER NOT NULL,
+    FOREIGN KEY (genre_id) REFERENCES genres (id)
+);
+CREATE TABLE IF NOT EXISTS occupations
+(
+    id    INTEGER PRIMARY KEY,
+    title TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS tag_movies
+(
+    id        INTEGER PRIMARY KEY,
+    tag_id    TEXT    NOT NULL,
+    movie_id  INTEGER NOT NULL,
+    timestamp INTEGER NOT NULL,
+    FOREIGN KEY (movie_id) REFERENCES movies (id) ON DELETE CASCADE,
+    FOREIGN KEY (tag_id) REFERENCES tags (id) ON DELETE CASCADE
+);
+
+-- filling new tables
+----- filling genres
+insert into genres(title)
+with t(id, gen, rest) as (select id, null, genres
+                          from movies
+                          union all
+                          select id,
+                                 case
+                                     when instr(rest, '|') = 0 then rest
+                                     else substr(rest, 1, instr(rest, '|') - 1) end,
+                                 case when instr(rest, '|') = 0 then null else substr(rest, instr(rest, '|') + 1) end
+                          from t
+                          where rest is not null
+                          order by id)
+select gen as 'Genres'
+from t
+where gen is not null
+group by gen;
+
+----- filling movies_genres
+INSERT INTO movies_genres (movie_id, genre_id)
+SELECT m.id,
+       g.id
+FROM movies m
+         JOIN genres g ON instr(m.genres, g.title);
+
+----- filling occupations
+INSERT INTO occupations(title)
+SELECT DISTINCT occupation
+FROM users;
+
+-- modify tables
+----- modify movies
+CREATE TABLE movies_temp
+(
+    id    INTEGER primary key,
+    title TEXT NOT NULL,
+    year  INTEGER
+);
+
+INSERT INTO movies_temp (id, title, year)
+SELECT id, title, year
+FROM movies;
+
+DROP TABLE movies;
+
+ALTER TABLE movies_temp
+    RENAME TO movies;
+
+----- modify users
+CREATE TABLE users_temp
+(
+    id            INTEGER primary key,
+    first_name    TEXT    NOT NULL,
+    last_name     TEXT    NOT NULL,
+    email         INTEGER NOT NULL,
+    register_date TEXT    NOT NULL,
+    gender        TEXT    NOT NULL,
+    occupation_id INTEGER NOT NULL,
+    FOREIGN KEY (occupation_id) REFERENCES occupations (id)
+);
+
+INSERT INTO users_temp (first_name, last_name, email, register_date, gender, occupation_id)
+SELECT substr(u.name, 0, instr(u.name, ' '))  as first_name,
+       substr(u.name, instr(u.name, ' ') + 1) as last_name,
+       u.email,
+       u.register_date,
+       gender,
+       o.id
+FROM users u
+         JOIN occupations o ON o.title = u.occupation;
+
+DROP TABLE users;
+
+ALTER TABLE users_temp
+    RENAME TO `users`;
+
+----- modify tags
+CREATE TABLE tags_temp
+(
+    id      INTEGER primary key,
+    user_id INTEGER NOT NULL,
+    title   TEXT    NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+INSERT INTO tags_temp (title, user_id)
+SELECT DISTINCT tag, user_id
+FROM tags
+GROUP BY tag;
+
+INSERT INTO tag_movies (tag_id, movie_id, timestamp)
+SELECT id, movie_id, timestamp
+FROM tags;
+
+DROP TABLE tags;
+
+ALTER TABLE tags_temp
+    RENAME TO tags;
+------------
+
+----- Indexing
+CREATE INDEX movies_year_index
+    ON movies (year);
+CREATE INDEX movies_title_index
+    ON movies (title);
+CREATE INDEX users_last_name_index
+    ON users (last_name);
+
+CREATE TABLE IF NOT EXISTS ratings_temp
+(
+    id        INTEGER PRIMARY KEY,
+    user_id   INTEGER,
+    movie_id  INTEGER,
+    rating    REAL,
+    timestamp INTEGER,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    FOREIGN KEY (movie_id) REFERENCES movies (id) ON DELETE CASCADE
+);
+
+INSERT INTO ratings_temp (user_id, movie_id, rating, timestamp)
+SELECT ratings.user_id, ratings.movie_id, ratings.rating, ratings.timestamp
+FROM ratings;
+
+DROP TABLE ratings;
+
+ALTER TABLE ratings_temp
+    RENAME TO ratings;
+
+PRAGMA foreign_keys = ON;
