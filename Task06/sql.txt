@@ -1,0 +1,80 @@
+CREATE TABLE IF NOT EXISTS users
+(
+    id         INTEGER PRIMARY KEY,
+    email      INTEGER NOT NULL UNIQUE,
+    first_name TEXT    NOT NULL,
+    last_name  TEXT    NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS specialties
+(
+    id    INTEGER PRIMARY KEY,
+    title TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS doctors
+(
+    id            INTEGER PRIMARY KEY,
+    user_id       INTEGER NOT NULL,
+    speciality_id INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id),
+    FOREIGN KEY (speciality_id) REFERENCES specialties (id)
+);
+
+CREATE TABLE IF NOT EXISTS services
+(
+    id    INTEGER PRIMARY KEY,
+    title TEXT    NOT NULL,
+    price DECIMAL NOT NULL
+);
+
+CREATE TABLE doctor_services
+(
+    id            INTEGER PRIMARY KEY,
+    doctor_id     INTEGER NOT NULL,
+    speciality_id INTEGER NOT NULL,
+    FOREIGN KEY (doctor_id) REFERENCES doctors (id),
+    FOREIGN KEY (speciality_id) REFERENCES specialties (id)
+);
+
+CREATE TABLE IF NOT EXISTS reception_statuses
+(
+    id    INTEGER PRIMARY KEY,
+    title TEXT
+);
+
+CREATE TABLE IF NOT EXISTS receptions
+(
+    id                 INTEGER PRIMARY KEY,
+    doctor_services_id INTEGER NOT NULL,
+    scheduled_at       TEXT,
+    started_at         TEXT,
+    ended_at           TEXT,
+    cancelled_at       TEXT,
+    is_completed       INTEGER,
+    status_id          INTEGER NOT NULL,
+    FOREIGN KEY (doctor_services_id) REFERENCES doctor_services (id),
+    FOREIGN KEY (status_id) REFERENCES reception_statuses (id)
+);
+
+CREATE TABLE IF NOT EXISTS billings
+(
+    id              INTEGER PRIMARY KEY,
+    doctor_id       INTEGER NOT NULL,
+    period          TEXT,
+    period_date     TEXT,
+    original_amount DECIMAL,
+    earnings_amount DECIMAL
+);
+
+CREATE TABLE IF NOT EXISTS statistics_receptions
+(
+    id                    INTEGER PRIMARY KEY,
+    related_entity_id     INTEGER NOT NULL,
+    sub_related_entity_id INTEGER NOT NULL,
+    `key`                 TEXT,
+    sub_key               TEXT,
+    value                 FLOAT   NOT NULL,
+    period                TEXT,
+    period_date           TEXT
+);
