@@ -4,10 +4,11 @@ require_once 'Connection.php';
 require_once 'DataAccess/ReceptionsRepository.php';
 require_once 'DataAccess/Repository.php';
 require_once 'Mappers/ReceptionsMapper.php';
-require_once 'ParametersValidator.php';
+require_once 'Utils/ParametersValidator.php';
+require_once 'Utils/ConsoleWriter.php';
 
 const INIT_COMMAND = 'init';
-const DB_NAME = 'movies_rating.db';
+const DB_NAME = 'clinic.db';
 const CURRENCY = 'RUB';
 
 shell_exec(INIT_COMMAND);
@@ -17,7 +18,7 @@ $doctorId = $validator->getInputParameters();
 $validationResult = $validator->validate($doctorId);
 
 if (!$validationResult->success) {
-    lineError($validationResult->message ?? 'Something is wrong');
+    $output->lineError($validationResult->message ?? 'Something is wrong');
     die();
 }
 
@@ -25,6 +26,7 @@ $connection = Connection::sqlite3(DB_NAME);
 
 $receptionsRepository = new ReceptionsRepository($connection);
 $mapper = new ReceptionsMapper();
+$output = new ConsoleWriter();
 
 $rawData = $doctorId === null ?
     $receptionsRepository->getAll() :
@@ -33,13 +35,13 @@ $rawData = $doctorId === null ?
 $receptions = $mapper->map($rawData);
 
 if (count($receptions) < 1) {
-    echo 'No receptions for this doctor yet';
+    $output->message('No receptions for this doctor yet');
     die();
 }
 
 foreach ($receptions as $reception) {
-    line();
-    lineWithFields(
+    $output->line();
+    $output->lineWithFields(
         '  ',
         $reception->doctor->id,
         $reception->doctor->firstName,
@@ -52,19 +54,5 @@ foreach ($receptions as $reception) {
         PHP_EOL
     );
 }
-line();
+$output->line();
 
-function line(): void
-{
-    echo '------------------------------------------------------------------------------------' . PHP_EOL;
-}
-
-function lineWithFields(string $glue, ...$parameters): void
-{
-    echo implode($glue, $parameters);
-}
-
-function lineError(string $message): void
-{
-    echo "Error: $message";
-}
