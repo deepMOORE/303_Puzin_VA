@@ -14,8 +14,10 @@ const CURRENCY = 'RUB';
 shell_exec(INIT_COMMAND);
 
 $validator = new ParametersValidator();
-$doctorId = $validator->getInputParameters();
+$doctorId = $validator->getInputParametersFromGlobals();
 $validationResult = $validator->validate($doctorId);
+
+$output = new ConsoleWriter();
 
 if (!$validationResult->success) {
     $output->lineError($validationResult->message ?? 'Something is wrong');
@@ -26,9 +28,8 @@ $connection = Connection::sqlite3(DB_NAME);
 
 $receptionsRepository = new ReceptionsRepository($connection);
 $mapper = new ReceptionsMapper();
-$output = new ConsoleWriter();
 
-$rawData = $doctorId === null ?
+$rawData = $doctorId === null || $doctorId === '' ?
     $receptionsRepository->getAll() :
     $receptionsRepository->getByDoctor((int)$doctorId);
 
