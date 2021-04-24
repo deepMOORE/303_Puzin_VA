@@ -1,1 +1,0 @@
-sqlite3 clinic.db < db_init.sql

@@ -7,7 +7,7 @@ require_once 'Mappers/ReceptionsMapper.php';
 require_once 'Utils/ParametersValidator.php';
 require_once 'Utils/ConsoleWriter.php';
 
-const INIT_COMMAND = 'init';
+const INIT_COMMAND = 'sqlite3 clinic.db < db_init.sql';
 const DB_NAME = 'clinic.db';
 const CURRENCY = 'RUB';
 
