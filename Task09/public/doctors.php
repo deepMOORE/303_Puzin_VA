@@ -74,6 +74,12 @@ $doctors = $doctorsRepository->getAll();
                     <input style="background-color: coral" type="submit" value="Edit">
                 </form>
             </td>
+            <td>
+                <form action="index.php" method="post">
+                    <input type="text" value="<?= $doctor->id ?>" hidden="true" name="doctorId">
+                    <input style="background-color: green" type="submit" value="Services by this doctor">
+                </form>
+            </td>
         </tr>
     <?php endforeach; ?>
 </table>
