@@ -1,9 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../app/Connection.php';
-require_once __DIR__ . '/../app/DataAccess/ReceptionsRepository.php';
 require_once __DIR__ . '/../app/DataAccess/DoctorsRepository.php';
-require_once __DIR__ . '/../app/Utils/ParametersValidator.php';
 
 const DB_PATH = __DIR__ . '/../data/clinic.db';
 
@@ -11,18 +9,7 @@ $connection = Connection::sqlite3(DB_PATH);
 
 $doctorsRepository = new DoctorsRepository($connection);
 
-$doctors = $doctorsRepository->getAllIds();
-
-$validator = new ParametersValidator();
-$doctorId = null;
-if(isset($_POST['doctorId'])){
-    $doctorId = $validator->getInputParametersFromPost('doctorId');
-    $validationResult = $validator->validate($doctorId);
-}
-
-$receptions = $doctorId === null || $doctorId === '' ?
-    $receptionsRepository->getAll() :
-    $receptionsRepository->getByDoctor((int)$doctorId);
+$doctors = $doctorsRepository->getAll();
 
 ?>
 
@@ -45,47 +32,38 @@ $receptions = $doctorId === null || $doctorId === '' ?
     </style>
 </head>
 <body>
-<h1>Please, select doctor's ID</h1>
-<form action="" method="POST">
-    <label>
-        <select style="width: 200px;" name="doctorId">
-            <option value=<?= null ?>>
-
-            </option>
-            <?php foreach($doctors as $doctorId): ?>
-                <option value=<?= $doctorId->value ?>>
-                    <?= $doctorId->value ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
-    </label>
-    <button type="submit">Search by ID</button>
-</form>
+<h1>There is all doctors</h1>
 <table class="doctors-table">
     <tr class="table-header">
-        <th>ID</th>
         <th>First Name</th>
         <th>Last Name</th>
         <th>Patronymic</th>
-        <th>Service name</th>
+        <th>Date of Birth</th>
+        <th>Speciality</th>
         <th>Status</th>
-        <th>Ended at</th>
-        <th>Price</th>
+        <th>Earning</th>
     </tr>
-    <?php foreach($receptions as $reception): ?>
+    <?php foreach ($doctors as $doctor): ?>
         <tr>
-            <td><?= $reception->id ?></td>
-            <td><?= $reception->doctorFirstName ?></td>
-            <td><?= $reception->doctorLastName ?></td>
-            <td><?= $reception->doctorPatronymic ?></td>
-            <td><?= $reception->serviceName ?></td>
-            <td><?= $reception->status ?></td>
-            <td><?= $reception->endedAt ?? 'Not ended yet' ?></td>
-            <td><?= $reception->price . '$' ?></td>
+            <td><?= $doctor->firstName ?></td>
+            <td><?= $doctor->lastName ?></td>
+            <td><?= $doctor->patronymic ?></td>
+            <td><?= $doctor->dateOfBirth ?></td>
+            <td><?= $doctor->speciality ?></td>
+            <td><?= $doctor->employeeStatus ?></td>
+            <td><?= $doctor->earningInPercents . '%' ?></td>
+            <td>
+                <form action="forms/delete-doctor/delete-doctor-handler.php" method="post">
+                    <input type="text" value="<?= $doctor->id ?>" hidden="true" name="doctorId">
+                    <input style="background-color: red" type="submit" value="Delete">
+                </form>
+            </td>
+            <td>
+                <button>Edit</button>
+            </td>
         </tr>
     <?php endforeach; ?>
 </table>
 <a href="forms/add-doctor/add-doctor-form.php" class="add-doctor-button">Add Doctor</a>
-<a href="forms/add-doctor/add-doctor-form.php" class="add-doctor-button">Go to doctors list</a>
 </body>
 </html>

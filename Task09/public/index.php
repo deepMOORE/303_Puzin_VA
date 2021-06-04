@@ -17,7 +17,7 @@ $doctorIds = $doctorsRepository->getAllIds();
 
 $validator = new ParametersValidator();
 $doctorId = null;
-if(isset($_POST['doctorId'])){
+if (isset($_POST['doctorId'])) {
     $doctorId = $validator->getInputParametersFromPost('doctorId');
     $validationResult = $validator->validate($doctorId);
 }
@@ -54,7 +54,7 @@ $receptions = $doctorId === null || $doctorId === '' ?
             <option value=<?= null ?>>
 
             </option>
-            <?php foreach($doctorIds as $doctorId): ?>
+            <?php foreach ($doctorIds as $doctorId): ?>
                 <option value=<?= $doctorId->value ?>>
                     <?= $doctorId->value ?>
                 </option>
@@ -74,7 +74,7 @@ $receptions = $doctorId === null || $doctorId === '' ?
         <th>Ended at</th>
         <th>Price</th>
     </tr>
-    <?php foreach($receptions as $reception): ?>
+    <?php foreach ($receptions as $reception): ?>
         <tr>
             <td><?= $reception->id ?></td>
             <td><?= $reception->doctorFirstName ?></td>
@@ -88,6 +88,7 @@ $receptions = $doctorId === null || $doctorId === '' ?
     <?php endforeach; ?>
 </table>
 <a href="forms/add-doctor/add-doctor-form.php" class="add-doctor-button">Add Doctor</a>
-<a href="forms/add-doctor/add-doctor-form.php" class="add-doctor-button">Go to doctors list</a>
+<br>
+<a href="doctors.php" class="add-doctor-button">Go to doctors list</a>
 </body>
 </html>

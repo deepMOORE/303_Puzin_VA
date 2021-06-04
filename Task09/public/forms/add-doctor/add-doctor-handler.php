@@ -18,7 +18,6 @@ $lastName = (string)$_POST['lastName'];
 $patronymic = (string)$_POST['patronymic'];
 $earningInPercents = (int)$_POST['earningInPercents'];
 try {
-    //todo: bad date type
     $dateOfBirth = new DateTime($_POST['dateOfBirth']);
 } catch (Exception $exception) {
     echo 'Wrong date, check placeholder';
@@ -40,4 +39,5 @@ try {
     echo 'Something went wrong';
 }
 
-echo 'Success! Doctor ID: ' . $doctorId;
+echo 'Success! Doctor ID: ' . $doctorId . PHP_EOL;
+echo '<a href="add-doctor-form.php" class="add-doctor-button">Add another one.</a>';
