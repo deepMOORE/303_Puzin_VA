@@ -59,7 +59,20 @@ $doctors = $doctorsRepository->getAll();
                 </form>
             </td>
             <td>
-                <button>Edit</button>
+                <form action="forms/update-doctor/update-doctor-form.php" method="post">
+                    <input type="text" value="<?= $doctor->id ?>" hidden="true" name="doctorId">
+                    <input type="text" value="<?= $doctor->firstName ?>" hidden="true" name="firstName">
+                    <input type="text" value="<?= $doctor->lastName ?>" hidden="true" name="lastName">
+                    <input type="text" value="<?= $doctor->patronymic ?>" hidden="true" name="patronymic">
+                    <input type="text" value="<?= $doctor->dateOfBirth ?>" hidden="true" name="dateOfBirth">
+                    <input type="text" value="<?= $doctor->employeeStatus ?>" hidden="true" name="employeeStatus">
+                    <input type="text" value="<?= $doctor->earningInPercents ?>" hidden="true" name="earningInPercents">
+                    <input type="text" value="<?= $doctor->specialityId ?>" hidden="true" name="specialityId">
+                    <input type="text" value="<?= $doctor->statusId ?>" hidden="true" name="statusId">
+                    <input type="text" value="<?= $doctor->speciality ?>" hidden="true" name="speciality">
+                    <input type="text" value="<?= $doctor->employeeStatus ?>" hidden="true" name="status">
+                    <input style="background-color: coral" type="submit" value="Edit">
+                </form>
             </td>
         </tr>
     <?php endforeach; ?>

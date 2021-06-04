@@ -9,5 +9,7 @@ class DoctorFullModel
     public string $dateOfBirth;
     public int $earningInPercents;
     public string $speciality;
+    public int $specialityId;
+    public int $statusId;
     public string $employeeStatus;
 }

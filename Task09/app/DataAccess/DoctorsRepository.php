@@ -35,6 +35,34 @@ VALUES (?, ?, ?, ?, ?, ?, ?)');
         return (int)$doctorId;
     }
 
+    public function update(DoctorUpdateModel $model): void
+    {
+        $connection = $this->getConnection();
+
+        $query = $connection
+            ->prepare('
+update doctors
+set first_name = ?,
+    last_name = ?,
+    patronymic = ?,
+    date_of_birth = ?,
+    speciality_id = ?,
+    employee_status_id = ?,
+    earning_in_percents = ?
+where id = ?');
+
+        $query->execute([
+            $model->firstName,
+            $model->lastName,
+            $model->patronymic,
+            $model->dateOfBirth->format('Y-m-d'),
+            $model->specialtyId,
+            $model->statusId,
+            $model->earningInPercents,
+            $model->id
+        ]);
+    }
+
     /**
      * @return DoctorIdModel[]
      */
@@ -64,7 +92,9 @@ select d.id                  as id,
        d.date_of_birth       as dateOfBirth,
        d.earning_in_percents as earningInPercents,
        s.title               as speciality,
-       es.title              as employeeStatus
+       d.speciality_id       as specialityId,
+       es.title              as employeeStatus,
+       es.id                 as statusId
 from doctors as d
          join specialties s on d.speciality_id = s.id
          join employee_statuses es on d.employee_status_id = es.id'
