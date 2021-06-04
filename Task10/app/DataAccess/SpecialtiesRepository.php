@@ -1,21 +1,32 @@
 <?php declare(strict_types=1);
 
-require_once __DIR__ . '/Repository.php';
+use RedBeanPHP\R;
+
 require_once __DIR__ . '/../Models/SpecialtyModel.php';
 
-class SpecialtiesRepository extends Repository
+class SpecialtiesRepository
 {
     /**
      * @return SpecialtyModel[]
      */
     public function getAll(): array
     {
-        return $this->getConnection()
-            ->query(
-                '
+        $sql = '
 select s.id as id, s.title as title   
-from specialties as s'
-            )
-            ->fetchAll(PDO::FETCH_CLASS, SpecialtyModel::class);
+from specialties as s';
+
+        $rows = R::getAll($sql);
+        $models = R::convertToBeans('specialties', $rows);
+
+        return array_map(
+            static function ($x) {
+                $model = new SpecialtyModel();
+                $model->id = $x->id;
+                $model->title = $x->title;
+
+                return $model;
+            },
+            $models
+        );
     }
 }

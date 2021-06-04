@@ -1,33 +1,35 @@
 <?php declare(strict_types=1);
 
-require_once __DIR__ . '/Repository.php';
+use RedBeanPHP\R;
+
 require_once __DIR__ . '/../Models/ReceptionModel.php';
 
-class ReceptionsRepository extends Repository
+class ReceptionsRepository
 {
-    /**
-     * @return ReceptionModel[]
-     */
     public function getAll(): array
     {
-        return $this->getConnection()
-            ->query(
-                '
-select d.id         as id,
-       d.first_name as doctorFirstName,
-       d.last_name  as doctorLastName,
-       d.patronymic as doctorPatronymic,
-       r.ended_at   as endedAt,
-       rs.title     as serviceName,
-       s.title      as status,
-       s.price      as price
+        $sql = '
+select d.id,
+       d.first_name,
+       d.last_name,
+       d.patronymic,
+       r.ended_at,
+       rs.title as reception_title,
+       s.title  as status_title,
+       s.price
 
 from receptions as r
          join doctors as d on r.doctor_id = d.id
          join services as s on r.service_id = s.id
-         join reception_statuses rs on r.status_id = rs.id'
-            )
-            ->fetchAll(PDO::FETCH_CLASS, ReceptionModel::class);
+         join reception_statuses rs on r.status_id = rs.id';
+
+        $rows = R::getAll($sql);
+        $receptions = R::convertToBeans('receptions', $rows);
+
+        return array_map(
+            $this->getMapFn(),
+            $receptions
+        );
     }
 
     /**
@@ -36,27 +38,45 @@ from receptions as r
      */
     public function getByDoctor(int $doctorId): array
     {
-        $statement = $this->getConnection()
-            ->prepare(
-                '
-select d.id         as id,
-       d.first_name as doctorFirstName,
-       d.last_name  as doctorLastName,
-       d.patronymic as doctorPatronymic,
-       r.ended_at   as endedAt,
-       rs.title     as serviceName,
-       s.title      as status,
-       s.price      as price
+        $sql = "
+select d.id,
+       d.first_name,
+       d.last_name,
+       d.patronymic,
+       r.ended_at,
+       rs.title as reception_title,
+       s.title  as status_title,
+       s.price
 
 from receptions as r
          join doctors as d on r.doctor_id = d.id
          join services as s on r.service_id = s.id
          join reception_statuses rs on r.status_id = rs.id
-where d.id = ?'
-            );
+where d.id = $doctorId";
 
-        $statement->execute([$doctorId]);
+        $rows = R::getAll($sql);
+        $receptions = R::convertToBeans('receptions', $rows);
 
-        return $statement->fetchAll(PDO::FETCH_CLASS, ReceptionModel::class);
+        return array_map(
+            $this->getMapFn(),
+            $receptions
+        );
+    }
+
+    private function getMapFn(): Closure
+    {
+        return static function ($x) {
+            $model = new ReceptionModel();
+            $model->id = (int)$x->id;
+            $model->doctorFirstName = $x->first_name;
+            $model->doctorLastName = $x->last_name;
+            $model->doctorPatronymic = $x->patronymic;
+            $model->endedAt = $x->ended_at;
+            $model->serviceName = $x->reception_title;
+            $model->status = $x->status_title;
+            $model->price = (float)$x->price;
+
+            return $model;
+        };
     }
 }

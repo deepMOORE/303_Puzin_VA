@@ -6,11 +6,18 @@ require_once __DIR__ . '/../../../app/DataAccess/DoctorsRepository.php';
 require_once __DIR__ . '/../../../app/Models/DoctorCreateModel.php';
 require_once __DIR__ . '/../../../app/Utils/ParametersValidator.php';
 
-const DB_PATH = __DIR__ . '/../../../data/clinic.db';
+require_once '../../../vendor/autoload.php';
+require_once __DIR__ . '/../../../app/DataAccess/SpecialtiesRepository.php';
 
-$connection = Connection::sqlite3(DB_PATH);
+use RedBeanPHP\R;
 
-$doctorsRepository = new DoctorsRepository($connection);
+const DB_PATH = __DIR__ . '/../data/clinic.db';
+
+$connectionString = 'sqlite:' . realpath(DB_PATH);
+
+R::setup($connectionString);
+
+$doctorsRepository = new DoctorsRepository();
 
 $specialtyId = (int)$_POST['specialtyId'];
 $firstName = (string)$_POST['firstName'];

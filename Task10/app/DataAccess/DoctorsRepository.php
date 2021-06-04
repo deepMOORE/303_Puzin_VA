@@ -1,38 +1,25 @@
 <?php declare(strict_types=1);
 
-require_once __DIR__ . '/Repository.php';
+use RedBeanPHP\R;
+
 require_once __DIR__ . '/../Models/DoctorIdModel.php';
 require_once __DIR__ . '/../Models/DoctorFullModel.php';
 require_once __DIR__ . '/../Models/DoctorCreateModel.php';
 
-class DoctorsRepository extends Repository
+class DoctorsRepository
 {
     public function create(DoctorCreateModel $model): int
     {
-        $connection = $this->getConnection();
+        $doctor = R::dispense('doctor');
+        $doctor->first_name = $model->firstName;
+        $doctor->last_name = $model->lastName;
+        $doctor->patronymic = $model->patronymic;
+        $doctor->date_of_birth = $model->dateOfBirth;
+        $doctor->speciality_id = $model->specialtyId;
+        $doctor->earning_in_percents = $model->earningInPercents;
+        $doctor->employee_status_id = 1; // new
 
-        $connection->beginTransaction();
-
-        $query = $connection
-            ->prepare('
-insert into doctors (first_name, last_name, patronymic, date_of_birth, speciality_id, earning_in_percents, employee_status_id)
-VALUES (?, ?, ?, ?, ?, ?, ?)');
-
-        $query->execute([
-            $model->firstName,
-            $model->lastName,
-            $model->patronymic,
-            $model->dateOfBirth->format('Y-m-d'),
-            $model->specialtyId,
-            $model->earningInPercents,
-            1 // work
-        ]);
-
-        $doctorId = $connection->lastInsertId();
-
-        $connection->commit();
-
-        return (int)$doctorId;
+        return R::store($doctor);
     }
 
     public function update(DoctorUpdateModel $model): void
@@ -68,13 +55,17 @@ where id = ?');
      */
     public function getAllIds(): array
     {
-        return $this->getConnection()
-            ->query(
-                '
-select d.id as value   
-from doctors as d'
-            )
-            ->fetchAll(PDO::FETCH_CLASS, DoctorIdModel::class);
+        $models = R::findAll('doctors');
+
+        return array_map(
+            static function ($x) {
+                $id = new DoctorIdModel();
+                $id->value = (int)$x->id;
+
+                return $id;
+            },
+            $models
+        );
     }
 
     /**
@@ -82,35 +73,46 @@ from doctors as d'
      */
     public function getAll(): array
     {
-        return $this->getConnection()
-            ->query(
-                '
-select d.id                  as id,
-       d.first_name          as firstName,
-       d.last_name           as lastName,
-       d.patronymic          as patronymic,
-       d.date_of_birth       as dateOfBirth,
-       d.earning_in_percents as earningInPercents,
-       s.title               as speciality,
-       d.speciality_id       as specialityId,
-       es.title              as employeeStatus,
-       es.id                 as statusId
+        $sql = '
+select d.id,
+       d.first_name,
+       d.last_name,
+       d.patronymic,
+       d.date_of_birth,
+       d.earning_in_percents,
+       s.title as specialty,
+       d.speciality_id,
+       es.title,
+       es.id as statusId
 from doctors as d
          join specialties s on d.speciality_id = s.id
-         join employee_statuses es on d.employee_status_id = es.id'
-            )
-            ->fetchAll(PDO::FETCH_CLASS, DoctorFullModel::class);
+         join employee_statuses es on d.employee_status_id = es.id';
+
+        $rows = R::getAll($sql);
+        $receptions = R::convertToBeans('doctors', $rows);
+
+        return array_map(
+            static function ($x) {
+                $model = new DoctorFullModel();
+                $model->id = (int)$x->id;
+                $model->firstName = $x->first_name;
+                $model->lastName = $x->last_name;
+                $model->patronymic = $x->patronymic;
+                $model->dateOfBirth = $x->date_of_birth;
+                $model->earningInPercents = (int)$x->earning_in_percents;
+                $model->speciality = $x->specialty;
+                $model->statusId = (int)$x->statusId;
+                $model->employeeStatus = $x->title;
+                $model->specialityId = (int)$x->speciality_id;
+
+                return $model;
+            },
+            $receptions
+        );
     }
 
     public function deleteById(int $id): void
     {
-        $query = $this->getConnection()
-            ->prepare('
-delete from doctors where id = ?
-            ');
-
-        $query->execute([
-            $id,
-        ]);
+        R::trash('doctors', $id);
     }
 }

@@ -1,0 +1,6 @@
+{
+    "name": "vladp/task10",
+    "require": {
+        "gabordemooij/redbean": "^5.7"
+    }
+}

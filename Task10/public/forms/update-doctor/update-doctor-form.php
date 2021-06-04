@@ -7,7 +7,7 @@ require_once __DIR__ . '/../../../app/DataAccess/StatusesRepository.php';
 
 const DB_PATH = __DIR__ . '/../../../data/clinic.db';
 
-$connection = Connection::sqlite3(DB_PATH);
+$connection = Connection::setupSqlite3RedBean(DB_PATH);
 
 $specialtiesRepository = new SpecialtiesRepository($connection);
 $statusesRepository = new StatusesRepository($connection);

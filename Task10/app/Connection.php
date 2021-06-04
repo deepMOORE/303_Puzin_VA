@@ -8,4 +8,11 @@ class Connection
 
         return new PDO($connectionString);
     }
+
+    public static function setupSqlite3RedBean(string $fileName): void
+    {
+        $connectionString = 'sqlite:' . realpath($fileName);
+
+        R::setup($connectionString);
+    }
 }

@@ -1,17 +1,22 @@
 <?php
 
+require_once '../vendor/autoload.php';
+
+use RedBeanPHP\R;
+
+const DB_PATH = __DIR__ . '/../data/clinic.db';
+
+$connectionString = 'sqlite:' . realpath(DB_PATH);
+
+R::setup($connectionString);
+
 require_once __DIR__ . '/../app/Connection.php';
 require_once __DIR__ . '/../app/DataAccess/ReceptionsRepository.php';
 require_once __DIR__ . '/../app/DataAccess/DoctorsRepository.php';
 require_once __DIR__ . '/../app/Utils/ParametersValidator.php';
 
-const DB_PATH = __DIR__ . '/../data/clinic.db';
-
-$connection = Connection::sqlite3(DB_PATH);
-
-$repository = new ReceptionsRepository($connection);
-$receptionsRepository = new ReceptionsRepository($connection);
-$doctorsRepository = new DoctorsRepository($connection);
+$receptionsRepository = new ReceptionsRepository();
+$doctorsRepository = new DoctorsRepository();
 
 $doctorIds = $doctorsRepository->getAllIds();
 

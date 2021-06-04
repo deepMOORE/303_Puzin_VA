@@ -1,15 +1,20 @@
 <?php declare(strict_types=1);
 
+require_once '../../../vendor/autoload.php';
 require_once __DIR__ . '/../../../app/Connection.php';
 require_once __DIR__ . '/../../../app/DataAccess/DoctorsRepository.php';
 
-const DB_PATH = __DIR__ . '/../../../data/clinic.db';
+use RedBeanPHP\R;
 
-$connection = Connection::sqlite3(DB_PATH);
+const DB_PATH = __DIR__ . '/../data/clinic.db';
 
-$doctorsRepository = new DoctorsRepository($connection);
+$connectionString = 'sqlite:' . realpath(DB_PATH);
+
+R::setup($connectionString);
 
 $id = (int)$_POST['doctorId'];
+
+$doctorsRepository = new DoctorsRepository();
 
 $doctorsRepository->deleteById($id);
 

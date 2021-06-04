@@ -1,22 +1,27 @@
 <?php declare(strict_types=1);
 
-require_once __DIR__ . '/Repository.php';
+use RedBeanPHP\R;
+
 require_once __DIR__ . '/../Models/StatusModel.php';
 
-class StatusesRepository extends Repository
+class StatusesRepository
 {
     /**
      * @return StatusModel[]
      */
     public function getAll(): array
     {
-        return $this->getConnection()
-            ->query(
-                '
-select s.id as id,
-       s.title as title   
-from employee_statuses as s'
-            )
-            ->fetchAll(PDO::FETCH_CLASS, StatusModel::class);
+        $models = R::findAll('employee_statuses');
+
+        return array_map(
+            static function ($x) {
+                $model = new StatusModel();
+                $model->id = $x->id;
+                $model->title = $x->title;
+
+                return $model;
+            },
+            $models
+        );
     }
 }
