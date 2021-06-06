@@ -16,7 +16,7 @@ class StatusesRepository
         return array_map(
             static function ($x) {
                 $model = new StatusModel();
-                $model->id = $x->id;
+                $model->id = (int)$x->id;
                 $model->title = $x->title;
 
                 return $model;

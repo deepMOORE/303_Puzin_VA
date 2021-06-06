@@ -1,16 +1,22 @@
 <?php
 
-require_once __DIR__ . '/../../../app/Connection.php';
+use RedBeanPHP\R;
+
 require_once __DIR__ . '/../../../app/DataAccess/DoctorsRepository.php';
 require_once __DIR__ . '/../../../app/DataAccess/SpecialtiesRepository.php';
 require_once __DIR__ . '/../../../app/DataAccess/StatusesRepository.php';
 
+require_once '../../../vendor/autoload.php';
+require_once __DIR__ . '/../../../app/DataAccess/SpecialtiesRepository.php';
+
 const DB_PATH = __DIR__ . '/../../../data/clinic.db';
 
-$connection = Connection::setupSqlite3RedBean(DB_PATH);
+$connectionString = 'sqlite:' . realpath(DB_PATH);
 
-$specialtiesRepository = new SpecialtiesRepository($connection);
-$statusesRepository = new StatusesRepository($connection);
+R::setup($connectionString);
+
+$specialtiesRepository = new SpecialtiesRepository();
+$statusesRepository = new StatusesRepository();
 
 $specialties = $specialtiesRepository->getAll();
 $statuses = $statusesRepository->getAll();

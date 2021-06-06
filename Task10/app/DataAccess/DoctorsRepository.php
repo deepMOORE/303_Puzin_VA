@@ -10,7 +10,7 @@ class DoctorsRepository
 {
     public function create(DoctorCreateModel $model): int
     {
-        $doctor = R::dispense('doctor');
+        $doctor = R::dispense('doctors');
         $doctor->first_name = $model->firstName;
         $doctor->last_name = $model->lastName;
         $doctor->patronymic = $model->patronymic;
@@ -24,30 +24,15 @@ class DoctorsRepository
 
     public function update(DoctorUpdateModel $model): void
     {
-        $connection = $this->getConnection();
-
-        $query = $connection
-            ->prepare('
-update doctors
-set first_name = ?,
-    last_name = ?,
-    patronymic = ?,
-    date_of_birth = ?,
-    speciality_id = ?,
-    employee_status_id = ?,
-    earning_in_percents = ?
-where id = ?');
-
-        $query->execute([
-            $model->firstName,
-            $model->lastName,
-            $model->patronymic,
-            $model->dateOfBirth->format('Y-m-d'),
-            $model->specialtyId,
-            $model->statusId,
-            $model->earningInPercents,
-            $model->id
-        ]);
+        $toUpdate = R::load('doctors', $model->id);
+        $toUpdate->first_name = $model->firstName;
+        $toUpdate->last_name = $model->lastName;
+        $toUpdate->patronymic = $model->patronymic;
+        $toUpdate->date_of_birth = $model->dateOfBirth;
+        $toUpdate->speciality_id = $model->specialtyId;
+        $toUpdate->status_id = $model->statusId;
+        $toUpdate->earning_in_percents = $model->earningInPercents;
+        R::store($toUpdate);
     }
 
     /**

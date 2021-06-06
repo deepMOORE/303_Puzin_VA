@@ -21,7 +21,7 @@ from specialties as s';
         return array_map(
             static function ($x) {
                 $model = new SpecialtyModel();
-                $model->id = $x->id;
+                $model->id = (int)$x->id;
                 $model->title = $x->title;
 
                 return $model;

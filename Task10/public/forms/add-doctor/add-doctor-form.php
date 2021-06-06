@@ -5,18 +5,14 @@ require_once __DIR__ . '/../../../app/DataAccess/SpecialtiesRepository.php';
 
 use RedBeanPHP\R;
 
-const DB_PATH = __DIR__ . '/../data/clinic.db';
+const DB_PATH = __DIR__ . '/../../../data/clinic.db';
 
 $connectionString = 'sqlite:' . realpath(DB_PATH);
 
 R::setup($connectionString);
 
 $specialtiesRepository = new SpecialtiesRepository();
-$all = R::findAll('doctors');
-var_dump($all);
 $specialties = $specialtiesRepository->getAll();
-
-var_dump($specialties);
 
 ?>
 

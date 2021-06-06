@@ -52,7 +52,7 @@ $receptions = $doctorId === null || $doctorId === '' ?
     </style>
 </head>
 <body>
-<h1>Please, select doctor's ID</h1>
+<h1>There is all existing receptions</h1>
 <form action="" method="POST">
     <label>
         <select style="width: 200px;" name="doctorId">
@@ -66,7 +66,7 @@ $receptions = $doctorId === null || $doctorId === '' ?
             <?php endforeach; ?>
         </select>
     </label>
-    <button type="submit">Search by ID</button>
+    <button type="submit">Search by doctor ID</button>
 </form>
 <table class="doctors-table">
     <tr class="table-header">

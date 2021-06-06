@@ -6,7 +6,7 @@ require_once __DIR__ . '/../../../app/DataAccess/DoctorsRepository.php';
 
 use RedBeanPHP\R;
 
-const DB_PATH = __DIR__ . '/../data/clinic.db';
+const DB_PATH = __DIR__ . '/../../../data/clinic.db';
 
 $connectionString = 'sqlite:' . realpath(DB_PATH);
 

@@ -1,15 +1,19 @@
 <?php declare(strict_types=1);
 
-require_once __DIR__ . '/../../../app/Connection.php';
+use RedBeanPHP\R;
+require_once '../../../vendor/autoload.php';
+
 require_once __DIR__ . '/../../../app/DataAccess/ReceptionsRepository.php';
 require_once __DIR__ . '/../../../app/DataAccess/DoctorsRepository.php';
 require_once __DIR__ . '/../../../app/Models/DoctorUpdateModel.php';
 
 const DB_PATH = __DIR__ . '/../../../data/clinic.db';
 
-$connection = Connection::setupSqlite3RedBean(DB_PATH);
+$connectionString = 'sqlite:' . realpath(DB_PATH);
 
-$doctorsRepository = new DoctorsRepository($connection);
+R::setup($connectionString);
+
+$doctorsRepository = new DoctorsRepository();
 
 $specialtyId = (int)$_POST['specialtyId'];
 $id = (int)$_POST['doctorId'];

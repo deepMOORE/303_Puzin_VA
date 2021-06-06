@@ -1,17 +1,17 @@
 <?php declare(strict_types=1);
 
+require_once '../../../vendor/autoload.php';
+use RedBeanPHP\R;
+
 require_once __DIR__ . '/../../../app/Connection.php';
 require_once __DIR__ . '/../../../app/DataAccess/ReceptionsRepository.php';
 require_once __DIR__ . '/../../../app/DataAccess/DoctorsRepository.php';
 require_once __DIR__ . '/../../../app/Models/DoctorCreateModel.php';
 require_once __DIR__ . '/../../../app/Utils/ParametersValidator.php';
 
-require_once '../../../vendor/autoload.php';
 require_once __DIR__ . '/../../../app/DataAccess/SpecialtiesRepository.php';
 
-use RedBeanPHP\R;
-
-const DB_PATH = __DIR__ . '/../data/clinic.db';
+const DB_PATH = __DIR__ . '/../../../data/clinic.db';
 
 $connectionString = 'sqlite:' . realpath(DB_PATH);
 

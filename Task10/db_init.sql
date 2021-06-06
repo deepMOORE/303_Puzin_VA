@@ -38,9 +38,7 @@ CREATE TABLE IF NOT EXISTS doctors
     date_of_birth       TEXT    NOT NULL,
     speciality_id       INTEGER NOT NULL,
     earning_in_percents INTEGER NOT NULL,
-    employee_status_id  INTEGER NOT NULL,
-    FOREIGN KEY (speciality_id) REFERENCES specialties (id),
-    FOREIGN KEY (employee_status_id) REFERENCES employee_statuses (id)
+    employee_status_id  INTEGER NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS clients
@@ -58,17 +56,14 @@ CREATE TABLE IF NOT EXISTS services
     title               TEXT    NOT NULL,
     price               DECIMAL NOT NULL,
     duration_in_minutes INTEGER NOT NULL,
-    category_id         INTEGER NOT NULL,
-    FOREIGN KEY (category_id) REFERENCES categories (id)
+    category_id         INTEGER NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS speciality_categories
 (
     id            INTEGER PRIMARY KEY,
     category_id   INTEGER NOT NULL,
-    speciality_id INTEGER NOT NULL,
-    FOREIGN KEY (category_id) REFERENCES categories (id),
-    FOREIGN KEY (speciality_id) REFERENCES specialties (id)
+    speciality_id INTEGER NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS reception_statuses
@@ -88,11 +83,7 @@ CREATE TABLE IF NOT EXISTS receptions
     ended_at     TEXT,
     cancelled_at TEXT,
     is_completed INTEGER,
-    status_id    INTEGER NOT NULL,
-    FOREIGN KEY (doctor_id) REFERENCES doctors (id),
-    FOREIGN KEY (client_id) REFERENCES clients (id),
-    FOREIGN KEY (service_id) REFERENCES services (id),
-    FOREIGN KEY (status_id) REFERENCES reception_statuses (id)
+    status_id    INTEGER NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS statistics_doctors
